@@ -1,0 +1,7 @@
+.svn
+*~
+*.diff
+*.orig
+*.rej
+.#*
+.htaccess
