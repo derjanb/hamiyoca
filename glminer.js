@@ -26,7 +26,7 @@ function throwOnGLError(err, funcName, args) {
 
 function meinWebGLStart(threads) {
         canvas = document.createElement('canvas');
-        if (debug || true) document.body.appendChild(canvas)
+        if (debug) document.body.appendChild(canvas)
         canvas.height = 1;
         canvas.width = threads;
 

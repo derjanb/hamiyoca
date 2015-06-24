@@ -119,8 +119,14 @@ function long_poll() {
     var done = function(resp) {
         if (resp.result || long_poll_suc) {
             long_poll_suc = true;
-            if (resp.result) onSuccess(resp);
-            long_poll();
+            if (resp.result) {
+                onSuccess(resp);
+                // Workaround to allow the WebWorker to load all files from single threaded web servers like "php -S"
+                window.setTimeout(long_poll, 1000);
+            } else {
+                long_poll();
+            }
+
         } else if (long_poll_suc === null) {
             console.log('Stop polling!!!!');
             long_poll_suc = false;

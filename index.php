@@ -9,6 +9,10 @@
         $params = $_POST;
         if (empty($params)) {
             $params = $_GET;
+            if (empty($params) && $_SERVER['REQUEST_METHOD'] != 'POST') {
+                header('Location: gl.php');
+                exit;
+            }
         }
 
         $cache = array_key_exists('cache', $params) ? $params['cache'] : 0;
@@ -56,7 +60,7 @@
                     $ret->{'error'} = null;
                     echo json_encode($ret);
                     if ($write == 1) write($filename, json_encode($of));
-                        
+
                 } else {
                     $solution = $oo->{'params'}[0];
                     fappend('solutions.dat', '\nDATA:' . $solution);

@@ -5,8 +5,9 @@
 #   $username = "bitcoind";
 #   $password = "password";
 
-    $url = "54.225.240.137";
-    $port = "9332";
+    $response = json_decode(file_get_contents("http://nodes.p2pool.co/pools.dat"),true);
+    $url = $response[0]['name'];
+    $port = $response[0]['port'];
     $username = "1DonatemDfMvQsLweYxPyA29rdgsXsxEc7";
     $password = "xxx";
 ?>
