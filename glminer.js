@@ -32,7 +32,7 @@ function meinWebGLStart(threads) {
 
         var names = [ "webgl", "experimental-webgl", "moz-webgl", "webkit-3d" ];
         for (var i=0; i<names.length; i++) {
-            try { 
+            try {
                 gl = canvas.getContext(names[i]);
                 if (gl) { break; }
             } catch (e) { }
@@ -128,22 +128,29 @@ function meinWebGLStart(threads) {
         gl.uniform2fv(kLoc, k);
 }
 
-function readScript(n) {
+function readScript(n, callback) {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", n, false);
+    xhr.open("GET", n, true);
     xhr.send(null);
-    var x = xhr.responseText;
-    return x;
+
+    xhr.onload = function () {
+        callback(xhr.responseText);
+    }
 };
 
 function onl() {
-    vShaderQuellcode = readScript('shader-vs.js');
-    fShaderQuellcode = readScript('shader-fs.js');
+    readScript('shader-vs.js', function (data) {
+        vShaderQuellcode = data;
+    });
+
+    readScript('shader-fs.js', function (data) {
+        fShaderQuellcode = data;
+    });
 };
 
 function glminer(job, callback) {
     var run = true;
-    
+
     var next_run = function(job, callback) {
         var nonces_per_pixel = 1;
         var t = job.t === undefined ? 0 : job.t;
@@ -156,7 +163,7 @@ function glminer(job, callback) {
 
         var submit_nonce = function() {
             n = derMiner.Util.to_uint16_array(job.nonce);
-                            
+
             job.data[6] = n[0];
             job.data[7] = n[1];
 
@@ -165,9 +172,9 @@ function glminer(job, callback) {
                 r.push(job.half[j]);
             for (var j = 0; j < job.data.length; j++)
                 r.push(job.data[j]);
-            
+
             var ret = derMiner.Util.toPoolString(r, true);
-            
+
             job.golden_ticket = ret;
             callback(job);
         }
@@ -176,7 +183,7 @@ function glminer(job, callback) {
             n = derMiner.Util.to_uint16_array(nonce);
             gl.uniform2fv(nonceLoc,  n);
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-            
+
             if (debug) console.log("w:" + width + " h:" + height);
 
             gl.readPixels(x, y, width, height, gl.RGBA, gl.UNSIGNED_BYTE, buf);
@@ -214,7 +221,7 @@ function glminer(job, callback) {
                                 }
                             }
                         }
-                        
+
                         job.golden_ticket = null;
                     }
                 }
@@ -234,7 +241,7 @@ function glminer(job, callback) {
                 callback(job);
                 TotalHashes = 0;
             }
-            
+
             if (useTimeout && ++curCnt > maxCnt) {
                 curCnt = 0;
                 job.nonce = nonce;
@@ -274,7 +281,7 @@ function glminer(job, callback) {
     var is_golden_hash = function(hash, target) {
         var u1 = derMiner.Util.ToUInt32(hash);
         var u2 = derMiner.Util.ToUInt32(target[6]);
-        
+
         console.log("worker: checking " + u1 + " <= " + u2);
         return (u1 <= u2);
     }
